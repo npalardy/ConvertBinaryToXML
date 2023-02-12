@@ -897,7 +897,7 @@ Protected Class RBBFToXMLConverter
 
 	#tag Method, Flags = &h1
 		Protected Function processOneBlock(blocktag as string, blockHead as blockHeader, data as memoryblock) As Integer
-		  outputWrite("<block type=""" + blocktag + """ ID=""" + Str(blockHead.id,"#####0") + """>")
+		  outputWrite("<block type=""" + blocktag + """ ID=""" + Str(blockHead.id,"-#####0") + """>")
 		  
 		  If BlockTag = "Project" Then
 		    blockHead.key1 = 0 
