@@ -37,10 +37,12 @@ Protected Class RBBFToXMLConverter
 		      Case fourCharCode("Blok") 
 		        
 		        If processBlocks( bis ) <> kSuccess Then
+		          Break
 		          Return kFail
 		        End If
 		        
 		      Case fourCharCode("EOF!")
+		        Break
 		        Exit While
 		      Else
 		        // Print(" unhandled blok tag type " + blockTagStr )
@@ -66,531 +68,35 @@ Protected Class RBBFToXMLConverter
 		    Return BlockTags.Value(tagChars) 
 		  Else
 		    Break
+		    
+		    Print "unknown block tag [" + tagChars + "]"
+		    
+		    Return ""
 		  End
 		  
-		  // Dim tagChars As String = fourCharAsString(int32Tag)
-		  // 
-		  // Select Case int32Tag
-		  // 
-		  // Case  fourCharCode("Proj") // project info block
-		  // Return "Project"
-		  // 
-		  // Case fourCharCode("pObj") // module 
-		  // Return "Module"
-		  // 
-		  // Case fourCharCode("pVew") // desktopwindow
-		  // Return "Window"
-		  // 
-		  // Case fourCharCode("pMnu") // menu
-		  // Return "Menu"
-		  // 
-		  // Case fourCharCode("pFol") // folder
-		  // Return "Folder"
-		  // 
-		  // Case fourCharCode("BSts") // main buildautomation entry
-		  // Return "BuildAutomation"
-		  // 
-		  // Case fourCharCode("Bsls") // each target
-		  // Return "BuildStepsList"
-		  // 
-		  // Case fourCharCode("BSbu") // build step
-		  // Return "BuildProjectStep"
-		  // 
-		  // Case fourCharCode("BScf") // copy files step
-		  // Return "CopyFilesStep"
-		  // 
-		  // Case fourCharCode("BSsc") // ide script steps
-		  // Return "IDEScriptStep"
-		  // 
-		  // Case fourCharCode("BSsn") // build step sign
-		  // Return "SignProjectScriptStep"
-		  // 
-		  // Case fourCharCode("IEsx") // external build script
-		  // Return "ExternalScriptStep"
-		  // 
-		  // Case fourCharCode("pRpt") // report
-		  // Return "Report"
-		  // 
-		  // Case fourcharCode("Aicn") // app icon
-		  // Return "ApplicationIcon"
-		  // 
-		  // Case fourcharCode("ioLS ") // ios launch screen
-		  // Return "IOSLaunchScreen"
-		  // 
-		  // Case fourCharCode("colr") // color group
-		  // Return "ColorAsset"
-		  // 
-		  // Case fourCharCode("Img ") // image
-		  // Return "MultiImage"
-		  // 
-		  // Case fourCharCode("pTbr") // toolbar
-		  // Return "Toolbar"
-		  // 
-		  // Case fourCharCode("WrKr") // worker
-		  // Return "Worker"
-		  // 
-		  // Case fourCharCode("pFTy") // filetype group
-		  // Return "FileTypes"
-		  // 
-		  // Case fourCharCode("pScn") // ios screen
-		  // Return "IOSScreen"
-		  // 
-		  // Case fourCharCode("iosv") // IOSView
-		  // Return "IOSView"
-		  // 
-		  // Case fourCharCode("Limg") // LaunchImages
-		  // Return "LaunchImages"
-		  // 
-		  // Case fourCharCode("pUIs") // ui state
-		  // Return "UIState"
-		  // 
-		  // Case fourcharCode("pWSe") //  Session
-		  // Return "WebSession"
-		  // 
-		  // Case fourcharCode("pWPg") //  Web page
-		  // Return "WebPage"
-		  // 
-		  // Case fourcharCode("pWSt") //  web style
-		  // Return "WebStyle"
-		  // 
-		  // Case fourCharCode("pLay") // ios layout
-		  // Return "IOSLayout"
-		  // 
-		  // Case fourcharCode("mobv") // mobile view ?
-		  // Return "MobileScreen"
-		  // 
-		  // Case fourcharCode("xWSs") // web 2 session
-		  // Return "WebSession"
-		  // 
-		  // Case fourcharCode("xWbV") // web 2 web page
-		  // Return "WebView"
-		  // 
-		  // Case fourCharCode("pExt") // external item
-		  // Return "ExternalCode"
-		  // 
-		  // Case fourCharCode("xWbC") // web 2 container
-		  // Return "WebContainer"
-		  // 
-		  // Else
-		  // Break
-		  // End Select
+		  
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function ConvertRBBFTagToXMLTag(rbbfTag as Int32) As String
+		Protected Function ConvertRBBFTagToXMLTag(rbbfTag as Int32) As string
+		  
 		  Dim tagChars As String = fourCharAsString(rbbftag)
 		  
 		  If Tags.HasKey(tagChars) Then
 		    Return Tags.Value(tagChars) 
 		  Else
 		    Break
+		    
+		    If isUnprintable(tagChars) Then
+		      tagchars = fourCharAsHex(rbbftag)
+		    End If
+		    
+		    Print "unknown tag [" + tagChars + "]"
+		    
+		    Return ""
 		  End
-		  
-		  // Select Case rbbftag
-		  // 
-		  // Case fourCharCode("aivi")
-		  // Return "AutoIncVersion"
-		  // Case fourCharCode("Alas")
-		  // Return "AliasName"
-		  // Case fourCharCode("alis")
-		  // Return "FileAlias"
-		  // Case fourCharCode("bApO")
-		  // Return "IsApplicationObject"
-		  // Case fourCharCode("BCar") // old from pre 2006 rbp's
-		  // Return "BuildCarbonMachOName"
-		  // Case fourCharCode("bCls")
-		  // Return "IsClass"
-		  // Case fourCharCode("BCMO")
-		  // Return "BuildCarbonMachOName"
-		  // Case fourCharCode("bFAS")
-		  // Return "BuildForAppStore"
-		  // Case fourCharCode("Bflg")
-		  // Return "BuildFlags"
-		  // Case fourCharCode("bhlp")
-		  // Return "ItemHelp"
-		  // Case fourCharCode("binE")
-		  // Return "BinaryEnum"
-		  // Case fourCharCode("BL86")
-		  // Return "BuildLinuxX86Name"
-		  // Case fourCharCode("BMDI")
-		  // Return "BuildWinMDI"
-		  // Case fourCharCode("bNtr")
-		  // Return "IsInterface"
-		  // Case fourCharCode("BunI")
-		  // Return "BundleIdentifier"
-		  // Case fourCharCode("BWin")
-		  // Return "BuildWinName"
-		  // Case fourCharCode("CBix")
-		  // Return "ControlIndex"
-		  // Case fourCharCode("ccls")
-		  // Return "ControlClass"
-		  // Case fourCharCode("ccls")
-		  // Return "ControlClass"
-		  // Case fourCharCode("Ci1a")
-		  // Return "HLCItem1Attr"
-		  // Case fourCharCode("Ci2a")
-		  // Return "HLCItem2Attr"
-		  // Case fourCharCode("CLan")
-		  // Return "CurrentLanguage"
-		  // Case fourCharCode("clr1")
-		  // Return "ColorLight"
-		  // Case fourCharCode("clr2")
-		  // Return "ColorDark"
-		  // Case fourCharCode("clrp")
-		  // Return "ColorPlatform"
-		  // Case fourCharCode("clrt")
-		  // Return "ColorType"
-		  // Case fourCharCode("cnfT")
-		  // Return "ConformsTo"
-		  // Case fourCharCode("Cni1")
-		  // Return "HLCItem1"
-		  // Case fourCharCode("Cni2")
-		  // Return "HLCItem2"
-		  // Case fourCharCode("CnLk")
-		  // Return "HLCEditable"
-		  // Case fourCharCode("CnMP")
-		  // Return "HLCScale"
-		  // Case fourCharCode("CnPr")
-		  // Return "HLCPriority"
-		  // Case fourCharCode("CnPv")
-		  // Return "HLCValue"
-		  // Case fourCharCode("CnRo")
-		  // Return "HLCRelOp"
-		  // Case fourCharCode("comM")
-		  // Return "Comment"
-		  // Case fourCharCode("Comp")
-		  // Return "Compatibility"
-		  // Case fourCharCode("Comp")
-		  // Return "Compatibility"
-		  // Case fourCharCode("Cont")
-		  // Return "ObjContainerID"
-		  // Case fourCharCode("cRDW")
-		  // Return "CopyWindowsRedist"
-		  // Case fourCharCode("data")
-		  // Return "ItemData"
-		  // Case fourcharcode("decl")
-		  // Return "ItemDeclaration"
-		  // Case fourCharCode("defn")
-		  // Return "ItemDef"
-		  // Case fourCharCode("defn")
-		  // Return "ItemDef"
-		  // Case fourCharCode("DEnc")
-		  // Return "DefaultEncoding"
-		  // Case fourCharCode("Dest")
-		  // Return "Subdirectory"
-		  // Case fourCharCode("deVi")
-		  // Return "Device"
-		  // Case fourCharCode("devT")
-		  // Return "DeviceType"
-		  // Case fourCharCode("DgCL")
-		  // Return "DebuggerCommandLine"
-		  // Case fourCharCode("dkmd")
-		  // Return "DarkMode"
-		  // Case fourCharCode("DLan ")
-		  // Return "DefaultLanguage"
-		  // Case fourCharCode("dscR")
-		  // Return "Description"
-		  // Case fourCharCode("DstR")
-		  // Return "Destination"
-		  // Case fourCharCode("DVew")
-		  // Return "DefaultViewID"
-		  // Case fourCharCode("Edpt")
-		  // Return "EditingPartID"
-		  // Case fourCharCode("enbl")
-		  // Return "Enabled"
-		  // Case fourCharCode("Enco")
-		  // Return "TextEncoding"
-		  // Case fourCharCode("Enco")
-		  // Return "TextEncoding"
-		  // Case fourCharCode("EnVv")
-		  // Return "EnvVars"
-		  // Case fourCharCode("flag")
-		  // Return "ItemFlags"
-		  // Case fourCharCode("flag")
-		  // Return "ItemFlags"
-		  // Case fourcharCode("FTpt")
-		  // Return "FilePhysicalType"
-		  // Case fourCharCode("FTRk")
-		  // Return "FileRank"
-		  // Case fourCharCode("GDIp")
-		  // Return "UseGDIPlus"
-		  // Case fourCharCode("HCla")
-		  // Return "HCLActive"
-		  // Case fourCharCode("HCnm")
-		  // Return "HLCName"
-		  // Case fourCharCode("hidp")
-		  // Return "HiDPI"
-		  // Case fourCharCode("iArc")
-		  // Return "IOSArchitecture"
-		  // Case fourCharCode("Icon")
-		  // Return "Icon"
-		  // Case fourCharCode("iDDv")
-		  // Return "IOSDebugDevice"
-		  // Case fourCharCode("IDEv")
-		  // Return "IDEVersion"
-		  // Case fourCharCode("iLck")
-		  // Return "Locked"
-		  // Case fourCharCode("imPo")
-		  // Return "Imported"
-		  // Case fourCharCode("indx")
-		  // Return "ItemIndex"
-		  // Case fourCharCode("Intr")
-		  // Return "Interfaces"
-		  // Case fourcharCode("ioPP")
-		  // Return "ProvisioningProfileName"
-		  // Case fourCharCode("iOri")
-		  // Return "IOSLayoutEditorViewOrientation"
-		  // Case fourCharCode("iOsC")
-		  // Return "IOSCapabilities"
-		  // Case fourcharCode("isBn")
-		  // Return "BuildiOSName"
-		  // Case fourCharCode("itHd")
-		  // Return "HeightDouble"
-		  // Case fourCharCode("itHt")
-		  // Return "Height"
-		  // Case fourCharCode("itWd")
-		  // Return "Width"
-		  // Case fourcharcode("itwD")
-		  // Return "WidthDouble"
-		  // Case fourCharCode("IVer")
-		  // Return "InfoVersion"
-		  // Case fourCharCode("iVTy")
-		  // Return "IOSLayoutEditorViewType"
-		  // Case fourCharCode("kUTI")
-		  // Return "UTIType"
-		  // Case fourCharCode("lang")
-		  // Return "ItemLanguage"
-		  // Case fourCharCode("Lib ")
-		  // Return "LibraryName"
-		  // Case fourCharCode("linA")
-		  // Return "LinuxArchitecture"
-		  // Case fourCharCode("LVer")
-		  // Return "LongVersion"
-		  // Case fourCharCode("macA")
-		  // Return "MacArchitecture"
-		  // Case fourCharCode("MacC")
-		  // Return "MacCreator"
-		  // Case fourCharCode("maEn")
-		  // Return "MenuAutoEnable"
-		  // Case fourCharCode("MaxW")
-		  // Return "WindowMaximized"
-		  // Case fourCharCode("MDIc")
-		  // Return "WinMDICaption"
-		  // Case fourCharCode("MiMk")
-		  // Return "MenuShortcutModifier"
-		  // Case fourCharCode("mimT")
-		  // Return "MimeType"
-		  // Case fourCharCode("MiSK")
-		  // Return "MenuShortcut"
-		  // Case fourCharCode("mVis")
-		  // Return "MenuItemVisible"
-		  // Case fourCharCode("name")
-		  // Return "ItemName"
-		  // Case fourCharCode("Name")
-		  // Return "ObjName"
-		  // Case fourCharCode("NnRl")
-		  // Return "NonRelease"
-		  // Case fourCharCode("ntln")
-		  // Return "NoteLine"
-		  // Case fourCharCode("objC")
-		  // Return "ObjectiveC"
-		  // Case fourCharCode("ocls")
-		  // Return "WebObjectClass"
-		  // Case fourCharCode("oPtL")
-		  // Return "OptimizationLevel"
-		  // Case fourCharCode("orie")
-		  // Return "Orientation"
-		  // Case fourCharCode("parm")
-		  // Return "ItemParams"
-		  // Case fourCharCode("path")
-		  // Return "FullPath"
-		  // Case fourCharCode("PDef")
-		  // Return "PropertyVal"
-		  // Case fourCharCode("plFM")
-		  // Return "Platform"
-		  // Case fourCharCode("pltf")
-		  // Return "ItemPlatform"
-		  // Case fourCharCode("ppth")
-		  // Return "PartialPath"
-		  // Case fourCharCode("PrGp")
-		  // Return "PropertyGroup"
-		  // Case fourCharCode("prTp")
-		  // Return "ProjectType"
-		  // Case fourCharCode("prWA")
-		  // Return "WebApp"
-		  // Case fourCharCode("PSIV")
-		  // Return "ProjectSavedInVers"
-		  // Case fourCharCode("PtID")
-		  // Return "PartID"
-		  // Case fourCharCode("PtID")
-		  // Return "PartID"
-		  // Case fourCharCode("PVal")
-		  // Return "PropertyValue"
-		  // Case fourCharCode("rEdt")
-		  // Return "EditBounds"
-		  // Case fourCharCode("Regn")
-		  // Return "Region"
-		  // Case fourCharCode("Rels")
-		  // Return "Release"
-		  // Case fourCharCode("resZ")
-		  // Return "Resolution"
-		  // Case fourCharCode("rslt")
-		  // Return "ItemResult"
-		  // Case fourCharCode("runA")
-		  // Return "WindowsRunAs"
-		  // Case fourCharCode("SCtx")
-		  // Return "ScriptText"
-		  // Case fourCharCode("scut")
-		  // Return "ItemShortcut"
-		  // Case fourCharCode("SEdC")
-		  // Return "EditorCount"
-		  // Case fourCharCode("SEId")
-		  // Return "EditorIndex"
-		  // Case fourCharCode("SELn")
-		  // Return "EditorLocation"
-		  // Case fourCharCode("SEPt")
-		  // Return "EditorPath"
-		  // Case fourCharCode("shrd")
-		  // Return "IsShared"
-		  // Case fourCharCode("Soft")
-		  // Return "SoftLink"
-		  // Case fourCharCode("spmu")
-		  // Return "ItemSpecialMenu"
-		  // Case fourCharCode("srcl")
-		  // Return "SourceLine"
-		  // Case fourCharCode("StpA")
-		  // Return "StepAppliesTo"
-		  // Case fourCharCode("StST")
-		  // Return "SelectedTab"
-		  // Case fourCharCode("styl")
-		  // Return "ItemStyle"
-		  // Case fourCharCode("Supr")
-		  // Return "Superclass"
-		  // Case fourCharCode("Supr")
-		  // Return "SuperClass"
-		  // Case fourCharCode("SVer")
-		  // Return "ShortVersion"
-		  // Case fourCharCode("svin")
-		  // Return "SaveInfo"
-		  // Case fourCharCode("SySF")
-		  // Return "SystemFlags"
-		  // Case fourCharCode("Targ")
-		  // Return "Target"
-		  // Case fourCharCode("text")
-		  // Return "ItemText"
-		  // Case fourCharCode("TVew")
-		  // Return "DefaultTabletViewID"
-		  // Case fourCharCode("type")
-		  // Return "ItemType"
-		  // Case fourCharCode("type")
-		  // Return "ItemType"
-		  // Case fourCharCode("UsBF")
-		  // Return "UseBuildsFolder"
-		  // Case fourCharCode("Usin")
-		  // Return "GlobalUsingClauses"
-		  // Case fourCharCode("vbET")
-		  // Return "EditorType"
-		  // Case fourCharCode("Ver1")
-		  // Return "MajorVersion"
-		  // Case fourCharCode("Ver2")
-		  // Return "MinorVersion"
-		  // Case fourCharCode("Ver3")
-		  // Return "SubVersion" 
-		  // Case fourCharCode("Vsbl")
-		  // Return "Visible"
-		  // Case fourCharCode("Vsbl")
-		  // Return "Visible"
-		  // Case fourCharCode("VwBh")
-		  // Return "ViewBehavior"
-		  // Case fourCharCode("WbAn")
-		  // Return "WebHostingAppName"
-		  // Case fourCharCode("WbDS")
-		  // Return "WebDisconnectString"
-		  // Case fourCharCode("WbHd")
-		  // Return "WebHostingDomain"
-		  // Case fourCharCode("WbHI")
-		  // Return "WebHostingIdentifier"
-		  // Case fourCharCode("WbLS")
-		  // Return "WebLaunchString"
-		  // Case fourCharCode("WcmN")
-		  // Return "BuildWinCompanyName"
-		  // Case fourCharCode("Wdpt")
-		  // Return "WebDebugPort"
-		  // Case fourCharCode("Web2")
-		  // Return "WebVersion"
-		  // Case fourCharCode("WHTM")
-		  // Return "WebHTMLHeader"
-		  // Case fourCharCode("WiFd")
-		  // Return "BuildWinFileDescription"
-		  // Case fourCharCode("winA")
-		  // Return "WindowsArchitecture"
-		  // Case fourCharCode("WiNm")
-		  // Return "BuildWinInternalName"
-		  // Case fourCharCode("wInV")
-		  // Return "WebControlInitialValue"
-		  // Case fourCharCode("WinV")
-		  // Return "WindowsVersions"
-		  // Case fourCharCode("Wpcl")
-		  // Return "WebProtocol"
-		  // Case fourCharCode("WpNm")
-		  // Return "BuildWinProductName"
-		  // Case fourCharCode("Wprt")
-		  // Return "WebPort"
-		  // Case fourCharCode("WptS")
-		  // Return "WebSecurePort"
-		  // Case fourCharCode("WSSI")
-		  // Return "WebStyleStateID"
-		  // 
-		  // // ones Xojo forgot to translate ?????
-		  // Case fourCharCode("Arch")
-		  // Return ""
-		  // 
-		  // // ones deliberately ignored
-		  // Case fourCharCode("lncs")
-		  // Return ""
-		  // Case fourCharCode("Padn")
-		  // Return ""
-		  // Case fourCharCode("pasw")
-		  // Return ""
-		  // Case fourCharCode("BMac") // pre 2005 rbps
-		  // Return ""
-		  // Case fourCharCode("BSiz") // pre 2005 rbps
-		  // Return ""
-		  // Case fourCharCode("BMSz") // pre 2005 rbps
-		  // Return ""
-		  // Case fourCharCode("OPSp") // pre 2005 rbps
-		  // Return ""
-		  // Case fourCharCode("eSpt") // pre 2005 rbps editor split
-		  // Return ""
-		  // Case fourCharCode("lstH") // pre 2005 LastPositionH
-		  // Return ""
-		  // Case fourCharCode("lstV") // pre 2005 LastPositionV
-		  // Return ""
-		  // Case fourCharCode("size") // pre 2005
-		  // Return ""
-		  // Case fourCharCode("stsr") // pre 2005
-		  // Return ""
-		  // Case fourCharCode("stsc") // pre 2005
-		  // Return ""
-		  // Case fourCharCode("ndsc") // pre 2005 EndSelCol
-		  // Return ""
-		  // Case fourCharCode("ndsr") // pre 2005 EndSelRow
-		  // Return ""
-		  // Case fourCharCode("Size") // pre 2005
-		  // Return ""
-		  // Case fourCharCode("dhlp") // pre 2005 ItemDisabledHelp
-		  // Return ""
-		  // 
-		  // Else
-		  // ' pasw
-		  // Dim unmappedTagStr As String
-		  // unmappedTagStr = fourCharAsString(rbbfTag)  
-		  // ' Print(" unmapped rbbf tag " + unmappedTagStr )
-		  // Break
-		  // End Select
-		  // 
 		  
 		End Function
 	#tag EndMethod
@@ -626,6 +132,12 @@ Protected Class RBBFToXMLConverter
 		    
 		    Return "<Rect left=""" + Str(tmpInt32_1,"-####0") + """ top=""" + Str(tmpInt32_2,"-####0") + """ width=""" + Str(tmpInt32_3,"-####0") + """ height=""" + Str(tmpInt32_4,"-####0") + """/>"
 		    
+		  Case fourCharCode("Grup") 
+		    Return ""
+		    
+		  Case fourCharCode("brkG") 
+		    Break
+		    Return ""
 		  Else
 		    Dim unhandledTag As String
 		    unhandledTag = fourCharAsString(inTag)
@@ -652,6 +164,25 @@ Protected Class RBBFToXMLConverter
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
+		Protected Function fourCharAsHex(fourChar as Int32) As string
+		  Dim mb As New memoryblock(4)
+		  mb.LittleEndian = False
+		  
+		  mb.UInt32Value(0) = fourChar
+		  
+		  dim retString as string = "0x"
+		  
+		  retString = retString + Right( "00" + Hex(mb.UInt8Value(0)), 2)
+		  retString = retString + Right( "00" + Hex(mb.UInt8Value(1)), 2)
+		  retString = retString + Right( "00" + Hex(mb.UInt8Value(2)), 2)
+		  retString = retString + Right( "00" + Hex(mb.UInt8Value(3)), 2)
+		  
+		  Return retString
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function fourCharAsString(fourChar as int32) As string
 		  Dim mb As New memoryblock(4)
 		  mb.LittleEndian = False
@@ -672,6 +203,22 @@ Protected Class RBBFToXMLConverter
 		  
 		  Return mb.Int32Value(0)
 		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function isUnprintable(s as String) As boolean
+		  Dim chars() As String = Split(s,"")
+		  
+		  For i As Integer = 0 To chars.ubound
+		    
+		    If Asc(chars(i)) < 32 Then
+		      Return True
+		    End If
+		    
+		  Next
+		  
+		  return false
 		End Function
 	#tag EndMethod
 
@@ -703,7 +250,10 @@ Protected Class RBBFToXMLConverter
 		    
 		  Next
 		  
-		  if 1 = 2 then break
+		  If 1 = 2 Then
+		    Break
+		  End If
+		  
 		End Sub
 	#tag EndMethod
 
@@ -782,6 +332,7 @@ Protected Class RBBFToXMLConverter
 		  Dim blockTypeStr As String = convertRBBFBlockTagToXMLBlockTag(blockHead.type)
 		  
 		  If processOneBlock(blockTypeStr, blockHead,  data ) <> kSuccess Then
+		    break
 		    Return kfail
 		  End If
 		  
@@ -797,7 +348,8 @@ Protected Class RBBFToXMLConverter
 		  
 		  Select Case tag
 		    
-		    
+		  Case fourCharCode("brkG") // control behaviour
+		    Return readGroup(bis, "BreakPointGroup")
 		  Case fourCharCode("CBhv") // control behaviour
 		    Return readGroup(bis, "ControlBehavior")
 		  Case fourCharCode("CIns") // constant instance
@@ -979,6 +531,9 @@ Protected Class RBBFToXMLConverter
 		  Dim grouptypetag As Int32 = bis.ReadInt32 // ALWAYS Grup !
 		  Dim grouptypeTagChars As String
 		  grouptypeTagChars = fourCharAsString(grouptypetag)
+		  If grouptypetag = fourCharCode("brkG") Then
+		    Break
+		  End If
 		  If grouptypetag <> fourCharCode("Grup") Then
 		    bis.Position = bis.position - 4
 		    Return False
@@ -1057,6 +612,9 @@ Protected Class RBBFToXMLConverter
 		  Dim grouptypetag As Int32 = bis.ReadInt32 // ALWAYS Grup !
 		  Dim grouptypeTagChars As String
 		  grouptypeTagChars = fourCharAsString(grouptypetag)
+		  If grouptypetag = fourCharCode("brkG") Then
+		    Break
+		  End If
 		  If grouptypetag <> fourCharCode("Grup") Then
 		    bis.Position = bis.position - 4
 		    Return False
@@ -1134,6 +692,8 @@ Protected Class RBBFToXMLConverter
 
 	#tag Method, Flags = &h1
 		Protected Function readStringFromStream(bis as BinaryStream) As string
+		  Dim readStart As Int64 = bis.Position
+		  
 		  Dim bytesToRead As Int32 = bis.ReadInt32
 		  
 		  Dim actualBytesToRead As Int32 = bytesToRead
@@ -1144,6 +704,10 @@ Protected Class RBBFToXMLConverter
 		  End If
 		  
 		  Dim data As String = bis.read(actualBytesToRead)
+		  
+		  // If bis.Position >= 2097516 Then
+		  // Break
+		  // End If
 		  
 		  data = Left(data, bytesToRead)
 		  
@@ -1157,6 +721,10 @@ Protected Class RBBFToXMLConverter
 		  Dim grouptypetag As Int32 = bis.ReadInt32 // ALWAYS Grup !
 		  Dim grouptypeTagChars As String
 		  grouptypeTagChars = fourCharAsString(grouptypetag)
+		  If grouptypetag = fourCharCode("brkG") Then
+		    Break
+		  End If
+		  
 		  If grouptypetag <> fourCharCode("Grup") Then
 		    bis.Position = bis.position - 4
 		    Return False
@@ -1364,7 +932,7 @@ Protected Class RBBFToXMLConverter
 	#tag Constant, Name = format_2_RBBFBlockTags, Type = String, Dynamic = False, Default = \"Aicn|ApplicationIcon\nBSbu|BuildProjectStep\nBScf|CopyFilesStep\nBsls|BuildStepsList\nBSsc|IDEScriptStep\nBSsn|SignProjectScriptStep\nBSts|BuildAutomation\ncolr|ColorAsset\nIEsx|ExternalScriptStep\nImg |MultiImage\nioLS|IOSLaunchScreen\niosv|IOSView\nLimg|LaunchImages\nmobv|MobileScreen\npExt|ExternalCode\npFol|Folder\npFTy|FileTypes\npLay|IOSLayout\npMnu|Menu\npObj|Module\nProj|Project\npRpt|Report\npScn|IOSScreen\npTbr|Toolbar\npUIs|UIState\npVew|Window\npWPg|WebPage\npWSe|WebSession\npWSt|WebStyle\nWrKr|Worker\nxWbC|WebContainer\nxWbV|WebView\nxWSs|WebSession\n\npDWn|DesktopWindow\npDTb|DesktopToolbar", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = format_2_Tags, Type = String, Dynamic = False, Default = \"aivi|AutoIncVersion\nAlas|AliasName\nalis|FileAlias\nArch|\nbApO|IsApplicationObject\nBCar|BuildCarbonMachOName\nbCls|IsClass\nBCMO|BuildCarbonMachOName\nbFAS|BuildForAppStore\nBflg|BuildFlags\nbhlp|ItemHelp\nbinE|BinaryEnum\nBL86|BuildLinuxX86Name\nBMac|\nBMDI|BuildWinMDI\nBMSz|\nbNtr|IsInterface\nBSiz|\nBunI|BundleIdentifier\nBWin|BuildWinName\nCBix|ControlIndex\nccls|ControlClass\nccls|ControlClass\nCi1a|HLCItem1Attr\nCi2a|HLCItem2Attr\nCLan|CurrentLanguage\nclr1|ColorLight\nclr2|ColorDark\nclrp|ColorPlatform\nclrt|ColorType\ncnfT|ConformsTo\nCni1|HLCItem1\nCni2|HLCItem2\nCnLk|HLCEditable\nCnMP|HLCScale\nCnPr|HLCPriority\nCnPv|HLCValue\nCnRo|HLCRelOp\ncomM|Comment\nComp|Compatibility\nComp|Compatibility\nCont|ObjContainerID\ncRDW|CopyWindowsRedist\ndata|ItemData\ndecl|ItemDeclaration\ndefn|ItemDef\ndefn|ItemDef\nDEnc|DefaultEncoding\nDest|Subdirectory\ndeVi|Device\ndevT|DeviceType\nDgCL|DebuggerCommandLine\ndhlp|\ndkmd|DarkMode\nDLan|DefaultLanguage\ndscR|Description\nDstR|Destination\nDVew|DefaultViewID\nEdpt|EditingPartID\nenbl|Enabled\nEnco|TextEncoding\nEnco|TextEncoding\nEnVv|EnvVars\neSpt|\nflag|ItemFlags\nflag|ItemFlags\nFTpt|FilePhysicalType\nFTRk|FileRank\nGDIp|UseGDIPlus\nHCla|HCLActive\nHCnm|HLCName\nhidp|HiDPI\niArc|IOSArchitecture\nIcon|Icon\niDDv|IOSDebugDevice\nIDEv|IDEVersion\niLck|Locked\nimPo|Imported\nindx|ItemIndex\nIntr|Interfaces\nioPP|ProvisioningProfileName\niOri|IOSLayoutEditorViewOrientation\niOsC|IOSCapabilities\nisBn|BuildiOSName\nitHd|HeightDouble\nitHt|Height\nitWd|Width\nitwD|WidthDouble\nIVer|InfoVersion\niVTy|IOSLayoutEditorViewType\nkUTI|UTIType\nlang|ItemLanguage\nLib |LibraryName\nlinA|LinuxArchitecture\nlncs|\nlstH|\nlstV|\nLVer|LongVersion\nmacA|MacArchitecture\nMacC|MacCreator\nmaEn|MenuAutoEnable\nMaxW|WindowMaximized\nMDIc|WinMDICaption\nMiMk|MenuShortcutModifier\nmimT|MimeType\nMiSK|MenuShortcut\nmVis|MenuItemVisible\nname|ItemName\nName|ObjName\nndsc|\nndsr|\nNnRl|NonRelease\nntln|NoteLine\nobjC|ObjectiveC\nocls|WebObjectClass\nOPSp|\noPtL|OptimizationLevel\norie|Orientation\nPadn|\nparm|ItemParams\npasw|\npath|FullPath\nPDef|PropertyVal\nplFM|Platform\npltf|ItemPlatform\nppth|PartialPath\nPrGp|PropertyGroup\nprTp|ProjectType\nprWA|WebApp\nPSIV|ProjectSavedInVers\nPtID|PartID\nPtID|PartID\nPVal|PropertyValue\nrEdt|EditBounds\nRegn|Region\nRels|Release\nresZ|Resolution\nrslt|ItemResult\nrunA|WindowsRunAs\nSCtx|ScriptText\nscut|ItemShortcut\nSEdC|EditorCount\nSEId|EditorIndex\nSELn|EditorLocation\nSEPt|EditorPath\nshrd|IsShared\nsize|\nSize|\nSoft|SoftLink\nspmu|ItemSpecialMenu\nsrcl|SourceLine\nStpA|StepAppliesTo\nstsc|\nstsr|\nStST|SelectedTab\nstyl|ItemStyle\nSupr|Superclass\nSVer|ShortVersion\nsvin|SaveInfo\nSySF|SystemFlags\nTarg|Target\ntext|ItemText\nTVew|DefaultTabletViewID\ntype|ItemType\ntype|ItemType\nUsBF|UseBuildsFolder\nUsin|GlobalUsingClauses\nvbET|EditorType\nVer1|MajorVersion\nVer2|MinorVersion\nVer3|SubVersion\nVsbl|Visible\nVsbl|Visible\nVwBh|ViewBehavior\nWbAn|WebHostingAppName\nWbDS|WebDisconnectString\nWbHd|WebHostingDomain\nWbHI|WebHostingIdentifier\nWbLS|WebLaunchString\nWcmN|BuildWinCompanyName\nWdpt|WebDebugPort\nWeb2|WebVersion\nWHTM|WebHTMLHeader\nWiFd|BuildWinFileDescription\nwinA|WindowsArchitecture\nWiNm|BuildWinInternalName\nwInV|WebControlInitialValue\nWinV|WindowsVersions\nWpcl|WebProtocol\nWpNm|BuildWinProductName\nWprt|WebPort\nWptS|WebSecurePort\nWSSI|WebStyleStateID\n", Scope = Private
+	#tag Constant, Name = format_2_Tags, Type = String, Dynamic = False, Default = \"aivi|AutoIncVersion\nAlas|AliasName\nalis|FileAlias\nArch|\nbApO|IsApplicationObject\nBCar|BuildCarbonMachOName\nbCls|IsClass\nBCMO|BuildCarbonMachOName\nbFAS|BuildForAppStore\nBflg|BuildFlags\nbhlp|ItemHelp\nbinE|BinaryEnum\nBL86|BuildLinuxX86Name\nBMac|\nBMDI|BuildWinMDI\nBMSz|\nbNtr|IsInterface\nBSiz|\nBunI|BundleIdentifier\nBWin|BuildWinName\nCBix|ControlIndex\nccls|ControlClass\nccls|ControlClass\nCi1a|HLCItem1Attr\nCi2a|HLCItem2Attr\nCLan|CurrentLanguage\nclr1|ColorLight\nclr2|ColorDark\nclrp|ColorPlatform\nclrt|ColorType\ncnfT|ConformsTo\nCni1|HLCItem1\nCni2|HLCItem2\nCnLk|HLCEditable\nCnMP|HLCScale\nCnPr|HLCPriority\nCnPv|HLCValue\nCnRo|HLCRelOp\ncomM|Comment\nComp|Compatibility\nComp|Compatibility\nCont|ObjContainerID\ncRDW|CopyWindowsRedist\ndata|ItemData\ndecl|ItemDeclaration\ndefn|ItemDef\ndefn|ItemDef\nDEnc|DefaultEncoding\nDest|Subdirectory\ndeVi|Device\ndevT|DeviceType\nDgCL|DebuggerCommandLine\ndhlp|\ndkmd|DarkMode\nDLan|DefaultLanguage\ndscR|Description\nDstR|Destination\nDVew|DefaultViewID\nEdpt|EditingPartID\nenbl|Enabled\nEnco|TextEncoding\nEnco|TextEncoding\nEnVv|EnvVars\neSpt|\nflag|ItemFlags\nflag|ItemFlags\nFTpt|FilePhysicalType\nFTRk|FileRank\nGDIp|UseGDIPlus\nHCla|HCLActive\nHCnm|HLCName\nhidp|HiDPI\niArc|IOSArchitecture\nIcon|Icon\niDDv|IOSDebugDevice\nIDEv|IDEVersion\nIPDB|IncludePDB\niLck|Locked\nimPo|Imported\nindx|ItemIndex\nIntr|Interfaces\nioPP|ProvisioningProfileName\niOri|IOSLayoutEditorViewOrientation\niOsC|IOSCapabilities\nisBn|BuildiOSName\nitHd|HeightDouble\nitHt|Height\nitWd|Width\nitwD|WidthDouble\nIVer|InfoVersion\niVTy|IOSLayoutEditorViewType\nkUTI|UTIType\nlang|ItemLanguage\nLib |LibraryName\nlinA|LinuxArchitecture\nlncs|\nlnNM|lineNum\nlstH|\nlstV|\nLVer|LongVersion\nmacA|MacArchitecture\nMacC|MacCreator\nMacV|MacMinimumVersion\nmaEn|MenuAutoEnable\nMaxW|WindowMaximized\nMDIc|WinMDICaption\nMiMk|MenuShortcutModifier\nmimT|MimeType\nMiSK|MenuShortcut\nmVis|MenuItemVisible\nname|ItemName\nName|ObjName\nndsc|\nndsr|\nNnRl|NonRelease\nntln|NoteLine\nobjC|ObjectiveC\nocls|WebObjectClass\nOPSp|\noPtL|OptimizationLevel\norie|Orientation\nPadn|\nparm|ItemParams\npasw|\npath|FullPath\nPDef|PropertyVal\nplFM|Platform\npltf|ItemPlatform\nppth|PartialPath\nPrGp|PropertyGroup\nprTp|ProjectType\nprWA|WebApp\nPSIV|ProjectSavedInVers\nPtID|PartID\nPtID|PartID\nPVal|PropertyValue\nrEdt|EditBounds\nRegn|Region\nRels|Release\nresZ|Resolution\nrslt|ItemResult\nrunA|WindowsRunAs\nSCtx|ScriptText\nscut|ItemShortcut\nSEdC|EditorCount\nSEId|EditorIndex\nSELn|EditorLocation\nSEPt|EditorPath\nshrd|IsShared\nsize|\nSize|\nSoft|SoftLink\nspmu|ItemSpecialMenu\nsrcl|SourceLine\nStpA|StepAppliesTo\nstsc|\nstsr|\nStST|SelectedTab\nstyl|ItemStyle\nSupr|Superclass\nSVer|ShortVersion\nsvin|SaveInfo\nSySF|SystemFlags\nTarg|Target\ntext|ItemText\nTVew|DefaultTabletViewID\ntype|ItemType\ntype|ItemType\nunTY|UnitType\nunID|UnitID\nUsBF|UseBuildsFolder\nUsin|GlobalUsingClauses\nvbET|EditorType\nVer1|MajorVersion\nVer2|MinorVersion\nVer3|SubVersion\nVsbl|Visible\nVsbl|Visible\nVwBh|ViewBehavior\nWbAn|WebHostingAppName\nWbDS|WebDisconnectString\nWbHd|WebHostingDomain\nWbHI|WebHostingIdentifier\nWbLS|WebLaunchString\nWcmN|BuildWinCompanyName\nWdpt|WebDebugPort\nWeb2|WebVersion\nWHTM|WebHTMLHeader\nWiFd|BuildWinFileDescription\nwinA|WindowsArchitecture\nWiNm|BuildWinInternalName\nwInV|WebControlInitialValue\nWinV|WindowsVersions\nWpcl|WebProtocol\nWpNm|BuildWinProductName\nWprt|WebPort\nWptS|WebSecurePort\nWSSI|WebStyleStateID\nWUI3|WinUIFramework", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = kFail, Type = Double, Dynamic = False, Default = \"-1", Scope = Public

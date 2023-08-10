@@ -113,7 +113,7 @@ Inherits ConsoleApplication
 		    If outfile.Directory = True Then 
 		      Print("output file is a directory - cant overwrite")
 		      Return kFail
-		    Elseif outfile.exists = True Then 
+		    ElseIf outfile.exists = True Then 
 		      Print("output file already exists")
 		      Return kFail
 		    Else
