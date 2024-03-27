@@ -3,6 +3,33 @@ Protected Class ConsoleApp
 Inherits ConsoleApplication
 	#tag Event
 		Function Run(args() as String) As Integer
+		  #If debugbuild 
+		    Redim args(3)
+		    args(0) = "spurious name of app !!!!!!"
+		    args(1) = "Text"
+		    
+		    // API 1 project
+		    args(2) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/toConvert.xojo_binary_project" 
+		    args(3) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/Converted.Xojo_project"
+		    
+		    // API 2 project
+		    // args(2) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/toConvertAPI2.xojo_binary_project" 
+		    // args(3) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/ConvertedAPI2.Xojo_project"
+		    
+		    
+		    // args(1) = "xml"
+		    
+		    // API 1 project
+		    // args(2) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/toConvert.xojo_binary_project" 
+		    // args(3) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/Converted.Xojo_xml_project"
+		    
+		    // API 2 project
+		    // args(2) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/toConvertAPI2.xojo_binary_project" 
+		    // args(3) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/ConvertedAPI2.Xojo_project"
+		    
+		    
+		  #EndIf
+		  
 		  If args.Ubound < 1 Then
 		    help
 		    Return kSuccess
@@ -32,11 +59,6 @@ Inherits ConsoleApplication
 
 	#tag Method, Flags = &h21
 		Private Function DoConvertToText(args() as string) As Integer
-		  #If debugbuild = False Then
-		    Print "Convert to text is not implemented"
-		    Return kFail
-		  #EndIf
-		  
 		  Dim infile As folderitem
 		  Dim outfile As folderitem
 		  

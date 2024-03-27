@@ -2,86 +2,82 @@
 Protected Class RBBFToTextConverter
 	#tag Method, Flags = &h0
 		Function ConvertFile(infile as folderitem, outfile as folderitem) As integer
-		  // If infile Is Nil Then 
-		  // Print("inputfile is nil")
-		  // Return kFail
-		  // End If
-		  // If infile.exists = False Then 
-		  // Print("inputfile does not exist")
-		  // Return kFail
-		  // End If
-		  // If infile.Directory = True Then 
-		  // Print("inputfile is a directory")
-		  // Return kFail
-		  // End If
-		  // If isRBBFFile(infile) <> True Then
-		  // Print("inputfile is not an rbbf file")
-		  // Return kFail
-		  // End If
-		  // 
-		  // If outfile Is Nil Then
-		  // Print("output directory can't be written to")
-		  // Return kFail
-		  // Elseif outfile.exists = True Then 
-		  // Print("output directory already exists")
-		  // Return kFail
-		  // Else
-		  // outfile.CreateAsFolder
-		  // outputRoot = outfile
-		  // End If
-		  // 
-		  // manifestStream = TextOutputStream.create( outputRoot.child("converted.xojo_project") )
-		  // 
-		  // // file header
-		  // Dim bis As BinaryStream = BinaryStream.Open(infile)
-		  // bis.LittleEndian = False
-		  // 
-		  // Dim header As format2header
-		  // header.StringValue(False) = bis.Read(format1header.Size)
-		  // If header.formatversion = 2 Then
-		  // bis.Position = 0
-		  // header.StringValue(False) = bis.Read(format2header.Size)
-		  // End If
-		  // 
-		  // bis.Position = header.firstblock
-		  // 
-		  // // now start reading blocks
-		  // 
-		  // Try
-		  // // outputWrite("<?xml version=""1.0"" encoding=""UTF-8""?>")
-		  // // outputWrite("<RBProject version=""\(mVersion)"" FormatVersion=""" + Str(header.formatversion,"0") + """ MinIDEVersion=""" + Str(header.minversion, "#######000") + """>")
-		  // 
-		  // While True
-		  // 
-		  // Dim blockTag As Int32 = bis.ReadInt32
-		  // Dim blockTagStr As String = fourCharAsString(blockTag)
-		  // 
-		  // Select Case blockTag 
-		  // Case fourCharCode("Blok") 
-		  // If processBlocks( bis ) <> kSuccess Then
-		  // Return kFail
-		  // End If
-		  // Case fourCharCode("EOF!")
-		  // exit while
-		  // Else
-		  // Print(" unhandled blok tag type " + blockTagStr )
-		  // End
-		  // 
-		  // Wend
-		  // 
-		  // // outputWrite("</RBProject>")
-		  // 
-		  // End Try
-		  // 
-		  // writeManifestBuffer
-		  // 
-		  // Return kSuccess
+		  If infile Is Nil Then 
+		    Print("inputfile is nil")
+		    Return kFail
+		  End If
+		  If infile.exists = False Then 
+		    Print("inputfile does not exist")
+		    Return kFail
+		  End If
+		  If infile.Directory = True Then 
+		    Print("inputfile is a directory")
+		    Return kFail
+		  End If
+		  If isRBBFFile(infile) <> True Then
+		    Print("inputfile is not an rbbf file")
+		    Return kFail
+		  End If
+		  
+		  If outfile Is Nil Then
+		    Print("output directory can't be written to")
+		    Return kFail
+		  ElseIf outfile.exists = True Then 
+		    Print("output directory already exists")
+		    Return kFail
+		  Else
+		    outfile.CreateAsFolder
+		    outputRoot = outfile
+		  End If
+		  
+		  manifestStream = TextOutputStream.create( outputRoot.child("converted.xojo_project") )
+		  
+		  // file header
+		  Dim bis As BinaryStream = BinaryStream.Open(infile)
+		  bis.LittleEndian = False
+		  
+		  Dim header As format2header
+		  header.StringValue(False) = bis.Read(format1header.Size)
+		  If header.formatversion = 2 Then
+		    bis.Position = 0
+		    header.StringValue(False) = bis.Read(format2header.Size)
+		  End If
+		  
+		  bis.Position = header.firstblock
+		  
+		  // now start reading blocks
+		  
+		  Try
+		    
+		    While True
+		      
+		      Dim blockTag As Int32 = bis.ReadInt32
+		      Dim blockTagStr As String = fourCharAsString(blockTag)
+		      
+		      Select Case blockTag 
+		      Case fourCharCode("Blok") 
+		        If processBlocks( bis ) <> kSuccess Then
+		          Return kFail
+		        End If
+		      Case fourCharCode("EOF!")
+		        Exit While
+		      Else
+		        Print(" unhandled blok tag type " + blockTagStr )
+		      End
+		      
+		    Wend
+		    
+		  End Try
+		  
+		  writeManifestBuffer
+		  
+		  Return kSuccess
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Function convertRBBFBlockTagToXMLBlockTag(int32Tag as Int32) As String
+		Protected Function ConvertRBBFBlockTagToXMLBlockTag(int32Tag as Int32) As String
 		  Dim tagChars As String = fourCharAsString(int32Tag)
 		  
 		  Select Case int32Tag
@@ -96,7 +92,7 @@ Protected Class RBBFToTextConverter
 		    Return "Window"
 		    
 		  Case fourCharCode("pMnu") // menu
-		    Return "Menu"
+		    Return "MenuBar"
 		    
 		  Case fourCharCode("pFolw") // folder
 		    Return "Folder"
@@ -183,9 +179,16 @@ Protected Class RBBFToTextConverter
 		    Return "ExternalCode"
 		    
 		  Case fourCharCode("xWbC") // web 2 container
-		    return "WebContainer"
+		    Return "WebContainer"
+		    
+		  Case fourCharCode("pDWn") // DesktopWindow
+		    Return "DesktopWindow"
 		    
 		  Else
+		    ' pasw
+		    Dim unmappedTagStr As String
+		    unmappedTagStr = tagChars
+		    Print("**** ERROR **** unmapped rbbf BLOCK tag " + unmappedTagStr )
 		    Break
 		  End Select
 		  
@@ -554,13 +557,18 @@ Protected Class RBBFToTextConverter
 		    Return "WebSecurePort"
 		  Case fourCharCode("WSSI")
 		    Return "WebStyleStateID"
-		    
+		  Case fourCharCode("IPDB")
+		    Return "IncludePDB"
+		  Case fourCharCode("WUI3")
+		    Return "WinUIFramework"
+		  Case fourCharCode("MacV")
+		    Return "MacOSMinimumVersion"
 		    
 		  Else
 		    ' pasw
 		    Dim unmappedTagStr As String
 		    unmappedTagStr = fourCharAsString(rbbfTag)  
-		    ' Print(" unmapped rbbf tag " + unmappedTagStr )
+		    Print("**** ERROR **** unmapped rbbf tag " + unmappedTagStr )
 		    Break
 		  End Select
 		  
@@ -1031,11 +1039,13 @@ Protected Class RBBFToTextConverter
 		  Case fourCharCode("WSSG") // web style state group
 		    Return readGroup(bis, "WebStyleStateGroup")
 		    
-		    
 		  Case fourCharCode("Dseg") // 2021r3 desktop segmented ... yeah
 		    Return readGroup(bis, "DesktopSegmentedButton")
 		    
 		  Else
+		    
+		    // Break
+		    
 		    Return False
 		  End Select
 		  
@@ -1048,7 +1058,21 @@ Protected Class RBBFToTextConverter
 		Protected Function processOneBlock(blocktag as string, blockHead as blockHeader, data as memoryblock) As Integer
 		  // outputWrite("<block type=""" + blocktag + """ ID=""" + Str(blockHead.id,"#####0") + """>")
 		  
+		  Dim extension As String = "xojo_code"
+		  Select Case blocktag
+		    
+		  Case "Window", "DesktopWindow"
+		    extension = "xojo_window"
+		    
+		  Case "MenuBar"
+		    extension = "xojo_menu"
+		    
+		  End Select
+		  
+		  // in a text project BLOCKS almost, without exception, turn into a single project file
+		  
 		  blockInfoStack.append New blockInfo
+		  blockInfoStack(blockInfoStack.Ubound).Extension = extension
 		  
 		  If blockHead.key1 <> 0 Or blockHead.key2 <> 0 Then
 		    
@@ -1056,6 +1080,8 @@ Protected Class RBBFToTextConverter
 		    value = MakeHexBytesValue("Blok" + blockhead.StringValue(data.LittleEndian) + data.StringValue(0,data.Size) )
 		    // outputWrite(value)
 		  Else
+		    
+		    blockInfoStack(blockInfoStack.Ubound).ID = blockHead.id
 		    
 		    // ok the mb we're handed we can use to back a binary stream !
 		    Dim bis As New BinaryStream(data)
@@ -1076,7 +1102,7 @@ Protected Class RBBFToTextConverter
 		        Dim typeTagChars As String
 		        typeTagChars = fourCharAsString(typeTag)
 		        
-		        Dim value As variant = ReadType(bis, typetag)
+		        Dim value As Variant = ReadType(bis, typetag)
 		        // If value.containsLowBytes Then
 		        // value = MakeHexBytesValue(value)
 		        // Else
@@ -1088,7 +1114,7 @@ Protected Class RBBFToTextConverter
 		        FileTag = ConvertRBBFTagToTextTag(tag)
 		        
 		        Select Case FileTag
-		        Case "Name"
+		        Case "Name", "ObjName"
 		          blockInfoStack(blockInfoStack.Ubound).ObjName = value
 		        Case "IsClass"
 		          blockInfoStack(blockInfoStack.Ubound).isClass = Int32ToBool(value)
@@ -1104,10 +1130,9 @@ Protected Class RBBFToTextConverter
 		          blockInfoStack(blockInfoStack.Ubound).IsApplicationObject = Int32ToBool(value)
 		        Case "Compatibility"
 		          blockInfoStack(blockInfoStack.Ubound).Compatibility = value
+		          
 		        Else
-		          If FileTag <> "" Then
-		            //outputWrite("<" + xmlTag + ">" + value + "</" + xmlTag + ">")
-		          End If
+		          
 		        End Select
 		        
 		      End
@@ -1115,7 +1140,33 @@ Protected Class RBBFToTextConverter
 		    Wend
 		  End If
 		  
-		  // outputWrite("</block>")
+		  // write this items entry to the manifest
+		  Break
+		  // Class=App;App.xojo_code;&h0000000013A767FF;&h0000000000000000;false
+		  // a simple form
+		  //
+		  // ItemType=ItemName;ItemPath;ItemID;containerID;isEncrypted;[Transparency];[MaskID]
+		  //
+		  // So, for  example, if I had an encrypted class named Foobar
+		  // whose ID was &h2156 and was inside a folder, it'd be written
+		  // out like this:
+		  //
+		  // Class=Foobar;Foobar.bas;&h2156;&h1234;true
+		  //
+		  // If the item is a Picture object, then the last two fields may be
+		  // present
+		  //
+		  // ItemPath is a relative path.  ".." means up one level
+		  // and all path separators are assumed to be the "/"
+		  // character, regardless of platform.
+		  //
+		  // All the fields are separated by a semi-colon
+		  
+		  If blockInfoStack(blockInfoStack.Ubound).IsApplicationObject Then
+		    // class not module
+		    manifestWrite("Class=" + blockInfoStack(blockInfoStack.Ubound).ObjName  ) // +_
+		    // ";" + 
+		  End If
 		  
 		  // pop the item as we wrote it
 		  
@@ -1396,20 +1447,31 @@ Protected Class RBBFToTextConverter
 		    
 		    If Left(mBufferedLines(i),Len("Type=")) = "Type=" Then
 		      
-		      If mProjectVersion > 2020 Then
-		        mBufferedLines(i) = "Type=Web2"
-		        isWeb2 = True
-		      Else
-		        mBufferedLines(i) = "Type=Web"
-		      End If
-		      
+		      Select Case mBufferedLines(i)
+		      Case "Type=0"
+		        mBufferedLines(i) = "Type=Desktop"
+		      Case "Type=1"
+		        mBufferedLines(i) = "Type=Console"
+		      Case "Type=3"
+		        If mProjectVersion > 2020 Then
+		          mBufferedLines(i) = "Type=Web2"
+		          isWeb2 = True
+		        Else
+		          mBufferedLines(i) = "Type=Web"
+		        End If
+		      Case "Type=4"
+		        mBufferedLines(i) = "Type=iOS"
+		      End Select
 		      sortorder.append 0
-		    Elseif Left(mBufferedLines(i),Len("RBProjectVersion=")) = "RBProjectVersion=" Then
+		      
+		    ElseIf Left(mBufferedLines(i),Len("RBProjectVersion=")) = "RBProjectVersion=" Then
 		      sortorder.Append 1
-		    Elseif Left(mBufferedLines(i),Len("MinIDEVersion=")) = "MinIDEVersion=" Then
+		      
+		    ElseIf Left(mBufferedLines(i),Len("MinIDEVersion=")) = "MinIDEVersion=" Then
 		      hasMinIDEVersion = True
 		      sortorder.Append 2
-		    Elseif Left(mBufferedLines(i),Len("OrigIDEVersion=")) = "OrigIDEVersion=" Then
+		      
+		    ElseIf Left(mBufferedLines(i),Len("OrigIDEVersion=")) = "OrigIDEVersion=" Then
 		      hasOrigIDEVersion = True
 		      sortorder.Append 3
 		    Else
