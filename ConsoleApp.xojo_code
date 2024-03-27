@@ -5,8 +5,8 @@ Inherits ConsoleApplication
 		Function Run(args() as String) As Integer
 		  #If debugbuild 
 		    Redim args(3)
-		    args(0) = "spurious name of app !!!!!!"
-		    args(1) = "Text"
+		    args(0) = app.ExecutableFile.NativePath
+		    args(1) = "text"
 		    
 		    // API 1 project
 		    args(2) = "/Users/npalardy/Great White Software/Xojo Converter/Converter Samples/2023r1/desktop/toConvert.xojo_binary_project" 
@@ -59,6 +59,10 @@ Inherits ConsoleApplication
 
 	#tag Method, Flags = &h21
 		Private Function DoConvertToText(args() as string) As Integer
+		  
+		  Print("Convert to TEXT format is not complete")
+		  Return 0
+		  
 		  Dim infile As folderitem
 		  Dim outfile As folderitem
 		  
